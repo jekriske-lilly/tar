@@ -36,7 +36,7 @@ property :manage_symlink_source, [true, false]
 action :install do
   r = new_resource
   basename = r.archive_name || ::File.basename(r.name)
-  dirname = basename.chomp('.tar.gz') # Assuming .tar.gz
+  dirname = basename.sub(/\.tar.../, '')
   src_dir = r.source_directory
 
   directory src_dir do
@@ -57,7 +57,7 @@ action :install do
   end
 
   execute "extract #{basename}" do
-    command "tar xfz #{basename}"
+    command "tar xf #{basename}"
     cwd src_dir
     creates "#{src_dir}/#{dirname}"
   end

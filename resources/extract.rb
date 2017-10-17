@@ -26,13 +26,13 @@
 property :source,                String, name_property: true
 property :checksum,              String
 property :download_dir,          String, default: Chef::Config[:file_cache_path]
-property :group,                 String, default: node['root_group']
+property :group,                 String
 property :mode,                  String, default: '0755'
 property :target_dir,            String
 property :creates,               String
-property :compress_char,         String, default: 'z'
+property :compress_char,         String, default: ''
 property :tar_flags,             [String, Array], default: []
-property :user,                  String, default: 'root'
+property :user,                  String, default: node['current_user']
 property :headers,               Hash
 property :use_etag,              [true, false], default: true
 property :use_last_modified,     [true, false], default: true
@@ -45,8 +45,6 @@ require 'shellwords'
 action :extract do
   r = new_resource
   basename = ::File.basename(r.name)
-  extname  = ::File.extname(r.name)
-  r.compress_char = '' if extname.casecmp('.xz') == 0
   local_archive = "#{r.download_dir}/#{basename}"
 
   directory r.download_dir do
@@ -86,7 +84,7 @@ action_class do
               else
                 r.tar_flags.join(' ')
               end
-      command "tar xf#{r.compress_char} #{local_archive.shellescape} #{flags}"
+      command "tar xf #{local_archive.shellescape} #{flags}"
       cwd r.target_dir
       creates r.creates
       group  r.group
