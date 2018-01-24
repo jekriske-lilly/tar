@@ -36,7 +36,7 @@ property :manage_symlink_source, [true, false]
 action :install do
   r = new_resource
   basename = r.archive_name || ::File.basename(r.name)
-  dirname = basename.sub(/\.tar.../, '')
+  dirname = basename.sub(/\.tar..*/, '')
   src_dir = r.source_directory
 
   directory src_dir do
